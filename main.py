@@ -16,8 +16,6 @@ def buat_koneksi():
         host = 'localhost'
         db_name = 'fruitstore'
 
-        print(user, password)
-
         # Format connection string: mysql+driver://username:password@host/database
         engine = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{db_name}')
         print("Koneksi ke database berhasil")  
@@ -132,6 +130,22 @@ def tampilkan_visualisasi(koneksi):
     except Exception as e:
         print(f"Terjadi error: '{e}'")
 
+def cari_buah(koneksi):
+    """Mencari data buah berdasarkan nama"""
+    try:
+        nama = input("Masukan nama buah yang dicari: ")
+        query = f"SELECT * FROM fruits WHERE name LIKE '%{nama}%'"
+        df = pd.read_sql(query, koneksi)
+
+        if df.empty:
+            print(f"Buah dengan nama '{nama}' tidak ditemukan")
+        else:
+            print("\n=== HASIL PENCARIAN ===")
+            print(df)
+
+    except Exception as e:
+        print(f"Terjadi error: '{e}'")
+
 def main():
     # Membuat koneksi ke database
     engine = buat_koneksi()
@@ -145,9 +159,10 @@ def main():
             print("2. Tambah buah baru")
             print("3. Hitung rata-rata kolom numerik")
             print("4. Tampilkan visualisasi data")
-            print("5. Keluar dari program")
+            print("5. Cari Buah")
+            print("6. Keluar dari program")
             
-            pilihan = input("Masukkan pilihan Anda (1-5): ")
+            pilihan = input("Masukkan pilihan Anda (1-6): ")
             
             if pilihan == "1":
                 tampilkan_dataframe(engine)
@@ -158,10 +173,12 @@ def main():
             elif pilihan == "4":
                 tampilkan_visualisasi(engine)
             elif pilihan == "5":
+                cari_buah(engine)
+            elif pilihan == "6":
                 print("Terima kasih, program dihentikan.")
                 break
             else:
-                print("Pilihan tidak valid. Silakan masukkan 1-5.")
+                print("Pilihan tidak valid. Silakan masukkan 1-6.")
                 
     finally:
         # Menutup koneksi database
